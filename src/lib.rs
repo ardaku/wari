@@ -105,11 +105,11 @@ use I::*;
 #[repr(u8)]
 #[derive(Copy, Clone)]
 pub enum Reg {
-    /// Always 0
+    /// SPECIAL: Always 0
     ZERO = 0u8,
     /// Return address
     RA = 1,
-    /// Stack pointer
+    /// SPECIAL: Stack pointer
     SP = 2,
     /// Global pointer
     GP = 3,
