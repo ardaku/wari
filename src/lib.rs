@@ -316,7 +316,14 @@ impl I {
     /// - funct3: 3
     /// - dst:    5
     /// - opcode: 7
-    fn r(opcode: u32, d: Reg, funct3: u32, s1: Reg, s2: Reg, funct7: u32) -> u32 {
+    fn r(
+        opcode: u32,
+        d: Reg,
+        funct3: u32,
+        s1: Reg,
+        s2: Reg,
+        funct7: u32,
+    ) -> u32 {
         let dst: u32 = (d as u8).into();
         let src1: u32 = (s1 as u8).into();
         let src2: u32 = (s2 as u8).into();
@@ -367,7 +374,14 @@ impl I {
     /// - funct3: 3
     /// - dst:    5
     /// - opcode  7
-    fn i7(opcode: u32, d: Reg, funct3: u32, s: Reg, im: i8, funct7: u32) -> u32 {
+    fn i7(
+        opcode: u32,
+        d: Reg,
+        funct3: u32,
+        s: Reg,
+        im: i8,
+        funct7: u32,
+    ) -> u32 {
         let im = im as u8;
         let im: u32 = im.into();
         let dst: u32 = (d as u8).into();
@@ -569,7 +583,9 @@ impl From<u32> for I {
                 (ZERO, 0b000, ZERO, 0b000000000001) => EBREAK {},
                 _ => panic!("Unknown Environment Control Transfer"),
             },
-            o => panic!("Failed to parse RISC-V Assembly, Unknown Opcode {}", o),
+            o => {
+                panic!("Failed to parse RISC-V Assembly, Unknown Opcode {}", o)
+            }
         }
     }
 }
