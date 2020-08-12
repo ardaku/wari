@@ -103,7 +103,7 @@ use I::*;
 
 /// A RISC-V Register
 #[repr(u8)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Reg {
     /// SPECIAL: Always 0
     ZERO = 0u8,
@@ -216,59 +216,59 @@ impl From<u32> for Reg {
 pub enum I {
     //// One of 40 User mode instructions in the RV32I Base Instruction Set ////
     /// U: Set upper 20 bits to immediate value
-    LUI { d: Reg, imm: u32 },
+    LUI { d: Reg, imm: i32 },
     /// U: Add upper 20 bits to immediate value in program counter
-    AUIPC { d: Reg, imm: u32 },
+    AUIPC { d: Reg, imm: i32 },
     /// UJ: Jump and Link
-    JAL { d: Reg, imm: u32 },
+    JAL { d: Reg, imm: i32 },
     /// I: Jump and Link, Register
-    JALR { d: Reg, s: Reg, imm: u16 },
+    JALR { d: Reg, s: Reg, imm: i16 },
     /// SB: 12-bit immediate offset Branch on Equal
-    BEQ { s1: Reg, s2: Reg, imm: u16 },
+    BEQ { s1: Reg, s2: Reg, imm: i16 },
     /// SB: 12-bit immediate offset Branch on Not Equal
-    BNE { s1: Reg, s2: Reg, imm: u16 },
+    BNE { s1: Reg, s2: Reg, imm: i16 },
     /// SB: 12-bit immediate offset Branch on Less Than
-    BLT { s1: Reg, s2: Reg, imm: u16 },
+    BLT { s1: Reg, s2: Reg, imm: i16 },
     /// SB: 12-bit immediate offset Branch on Greater Than Or Equal To
-    BGE { s1: Reg, s2: Reg, imm: u16 },
+    BGE { s1: Reg, s2: Reg, imm: i16 },
     /// SB: 12-bit immediate offset Branch on Less Than (Unsigned)
-    BLTU { s1: Reg, s2: Reg, imm: u16 },
+    BLTU { s1: Reg, s2: Reg, imm: i16 },
     /// SB: 12-bit immediate offset Branch on Greater Than Or Equal To (Unsigned)
-    BGEU { s1: Reg, s2: Reg, imm: u16 },
+    BGEU { s1: Reg, s2: Reg, imm: i16 },
     /// I: Load Byte (R[d]: M[R[s] + imm])
-    LB { d: Reg, s: Reg, imm: u16 },
+    LB { d: Reg, s: Reg, imm: i16 },
     /// I: Load Half-Word (R[d]: M[R[s] + imm])
-    LH { d: Reg, s: Reg, imm: u16 },
+    LH { d: Reg, s: Reg, imm: i16 },
     /// I: Load Word (R[d]: M[R[s] + imm])
-    LW { d: Reg, s: Reg, imm: u16 },
+    LW { d: Reg, s: Reg, imm: i16 },
     /// I: Load Byte Unsigned (R[d]: M[R[s] + imm])
-    LBU { d: Reg, s: Reg, imm: u16 },
+    LBU { d: Reg, s: Reg, imm: i16 },
     /// I: Load Half Unsigned (R[d]: M[R[s] + imm])
-    LHU { d: Reg, s: Reg, imm: u16 },
+    LHU { d: Reg, s: Reg, imm: i16 },
     /// S: Store Byte
-    SB { s1: Reg, s2: Reg, imm: u16 },
+    SB { s1: Reg, s2: Reg, imm: i16 },
     /// S: Store Half Word
-    SH { s1: Reg, s2: Reg, imm: u16 },
+    SH { s1: Reg, s2: Reg, imm: i16 },
     /// S: Store Word
-    SW { s1: Reg, s2: Reg, imm: u16 },
+    SW { s1: Reg, s2: Reg, imm: i16 },
     /// I: Add Immediate (R[d]: R[s] + imm)
-    ADDI { d: Reg, s: Reg, imm: u16 },
+    ADDI { d: Reg, s: Reg, imm: i16 },
     /// I: Set 1 on Less Than, 0 Otherwise Immediate
-    SLTI { d: Reg, s: Reg, imm: u16 },
+    SLTI { d: Reg, s: Reg, imm: i16 },
     /// I: Set 1 on Less Than, 0 Otherwise Immediate Unsigned
-    SLTUI { d: Reg, s: Reg, imm: u16 },
+    SLTUI { d: Reg, s: Reg, imm: i16 },
     /// I: Xor Immediate
-    XORI { d: Reg, s: Reg, imm: u16 },
+    XORI { d: Reg, s: Reg, imm: i16 },
     /// I: Or Immediate
-    ORI { d: Reg, s: Reg, imm: u16 },
+    ORI { d: Reg, s: Reg, imm: i16 },
     /// I: And Immediate
-    ANDI { d: Reg, s: Reg, imm: u16 },
+    ANDI { d: Reg, s: Reg, imm: i16 },
     /// I: Logical Left Shift Immediate
-    SLLI { d: Reg, s: Reg, imm: u8 },
+    SLLI { d: Reg, s: Reg, imm: i8 },
     /// I: Logical Right Shift Immediate
-    SRLI { d: Reg, s: Reg, imm: u8 },
+    SRLI { d: Reg, s: Reg, imm: i8 },
     /// I: Arithmetic Shift Right Immediate (See SRA).
-    SRAI { d: Reg, s: Reg, imm: u8 },
+    SRAI { d: Reg, s: Reg, imm: i8 },
     /// R: Add (R[d]: R[s1] + R[s2])
     ADD { d: Reg, s1: Reg, s2: Reg },
     /// R: Subtract (R[d]: R[s1] - R[s2])
@@ -295,7 +295,7 @@ pub enum I {
     EBREAK {},
     /// I: Fence (Immediate Is Made Up Of Ordered High Order To Low Order Bits:)
     /// - fm(4), PI(1), PO(1), PR(1), PW(1), SI(1), SO(1), SR(1), SW(1)
-    FENCE { imm: u16 },
+    FENCE { imm: i16 },
     //// Multiply Extension ////
 
     //// Atomic Extension ////
@@ -342,8 +342,8 @@ impl I {
     /// - funct3: 3
     /// - dst:    5
     /// - opcode  7
-    fn i(opcode: u32, d: Reg, funct3: u32, s: Reg, imm: u16) -> u32 {
-        let imm: u32 = imm.into();
+    fn i(opcode: u32, d: Reg, funct3: u32, s: Reg, imm: i16) -> u32 {
+        let imm: u32 = (imm as u16).into();
         let dst: u32 = (d as u8).into();
         let src: u32 = (s as u8).into();
         let mut out = opcode;
@@ -353,11 +353,11 @@ impl I {
         out |= imm << 20;
         out
     }
-    fn from_i(instruction: u32) -> (Reg, u32, Reg, u16) {
+    fn from_i(instruction: u32) -> (Reg, u32, Reg, i16) {
         let d = Reg::from((instruction & (0b11111 << 7)) >> 7);
         let funct3 = (instruction & (0b111 << 12)) >> 12;
         let s = Reg::from((instruction & (0b11111 << 15)) >> 15);
-        let imm = (instruction >> 20) as u16;
+        let imm = ((instruction >> 20) as u16) as i16;
         (d, funct3, s, imm)
     }
 
@@ -367,7 +367,8 @@ impl I {
     /// - funct3: 3
     /// - dst:    5
     /// - opcode  7
-    fn i7(opcode: u32, d: Reg, funct3: u32, s: Reg, imm: u8, funct7: u32) -> u32 {
+    fn i7(opcode: u32, d: Reg, funct3: u32, s: Reg, imm: i8, funct7: u32) -> u32 {
+        let imm = imm as u8;
         let imm: u32 = imm.into();
         let dst: u32 = (d as u8).into();
         let src: u32 = (s as u8).into();
@@ -379,13 +380,13 @@ impl I {
         out |= funct7 << 25;
         out
     }
-    fn from_i7(instruction: u32) -> (Reg, u32, Reg, u8, u32) {
+    fn from_i7(instruction: u32) -> (Reg, u32, Reg, i8, u32) {
         let d = Reg::from((instruction & (0b11111 << 7)) >> 7);
         let funct3 = (instruction & (0b111 << 12)) >> 12;
         let s = Reg::from((instruction & (0b11111 << 15)) >> 15);
         let imm = ((instruction & (0b11111 << 20)) >> 20) as u8;
         let funct7 = instruction >> 25;
-        (d, funct3, s, imm, funct7)
+        (d, funct3, s, imm as i8, funct7)
     }
 
     /// - imm_h:  7
@@ -394,8 +395,8 @@ impl I {
     /// - funct3: 3
     /// - imm_l:  5
     /// - opcode  7
-    fn s(opcode: u32, funct3: u32, s1: Reg, s2: Reg, imm: u16) -> u32 {
-        let imm: u32 = imm.into();
+    fn s(opcode: u32, funct3: u32, s1: Reg, s2: Reg, imm: i16) -> u32 {
+        let imm: u32 = (imm as u16).into();
         let src1: u32 = (s1 as u8).into();
         let src2: u32 = (s2 as u8).into();
         let mut out = opcode;
@@ -406,29 +407,30 @@ impl I {
         out |= (imm >> 5) << 25;
         out
     }
-    fn from_s(instruction: u32) -> (u32, Reg, Reg, u16) {
+    fn from_s(instruction: u32) -> (u32, Reg, Reg, i16) {
         let mut imm = ((instruction & (0b11111 << 7)) >> 7) as u16;
         let funct3 = (instruction & (0b111 << 12)) >> 12;
         let s1 = Reg::from((instruction & (0b11111 << 15)) >> 15);
         let s2 = Reg::from((instruction & (0b11111 << 20)) >> 20);
         imm |= ((instruction >> 25) as u16) << 5;
-        (funct3, s1, s2, imm)
+        (funct3, s1, s2, imm as i16)
     }
 
     /// - imm:    20
     /// - dst:    5
     /// - opcode  7
-    fn u(opcode: u32, d: Reg, imm: u32) -> u32 {
+    fn u(opcode: u32, d: Reg, imm: i32) -> u32 {
+        let imm = imm as u32;
         let dst: u32 = (d as u8).into();
         let mut out = opcode;
         out |= dst << 7;
         out |= imm << 12;
         out
     }
-    fn from_u(instruction: u32) -> (Reg, u32) {
+    fn from_u(instruction: u32) -> (Reg, i32) {
         let d = Reg::from((instruction & (0b11111 << 7)) >> 7);
         let imm = instruction >> 12;
-        (d, imm)
+        (d, imm as i32)
     }
 }
 
