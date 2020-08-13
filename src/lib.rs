@@ -219,7 +219,7 @@ pub enum I {
     LUI { d: Reg, im: i32 },
     /// U: Add upper 20 bits to immediate value in program counter
     AUIPC { d: Reg, im: i32 },
-    /// UJ: Jump and Link
+    /// UJ: Jump and Link Relative
     JAL { d: Reg, im: i32 },
     /// I: Jump and Link, Register
     JALR { d: Reg, s: Reg, im: i16 },
