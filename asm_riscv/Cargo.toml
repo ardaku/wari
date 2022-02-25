@@ -14,7 +14,7 @@ version = "0.1.0"
 license = "Apache-2.0 OR MIT OR BSL-1.0"
 description = "RISC-V Assembly Encoder / Decoder."
 repository = "https://github.com/AldaronLau/wari"
-documentation = "https://docs.rs/wari"
+documentation = "https://docs.rs/asm_riscv"
 homepage = "https://github.com/AldaronLau/wari/blob/stable/asm_riscv/CHANGELOG.md"
 include = ["Cargo.toml", "README.md", "src/*"]
 categories = [
@@ -22,7 +22,6 @@ categories = [
     "encoding",
     "hardware-support",
     "parser-implementations",
-    "parsing",
 ]
 keywords = ["riscv", "assembly", "encode", "decode", "asm"]
 readme = "README.md"

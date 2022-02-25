@@ -98,6 +98,29 @@
 //! add $d, $d, $e
 //! ```
 
+#![no_std]
+#![doc(
+    html_logo_url = "https://ardaku.github.io/mm/logo.svg",
+    html_favicon_url = "https://ardaku.github.io/mm/icon.svg",
+    html_root_url = "https://docs.rs/asm_riscv"
+)]
+#![deny(unsafe_code)]
+#![warn(
+    anonymous_parameters,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    missing_docs,
+    nonstandard_style,
+    rust_2018_idioms,
+    single_use_lifetimes,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unused_extern_crates,
+    unused_qualifications,
+    variant_size_differences
+)]
+
 use Reg::*;
 use I::*;
 
@@ -213,6 +236,8 @@ impl From<u32> for Reg {
 
 /// An assembly instruction (im is limited to 12 bits)
 #[allow(clippy::enum_variant_names)]
+#[allow(missing_docs)]
+#[derive(Copy, Clone, Debug)]
 pub enum I {
     //// One of 40 User mode instructions in the RV32I Base Instruction Set ////
     /// U: Set upper 20 bits to immediate value
