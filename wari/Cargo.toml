@@ -27,4 +27,4 @@ readme = "../README.md"
 edition = "2021"
 
 [dependencies]
-asm_riscv = "0.1"
+asm_riscv = { path = "../asm_riscv" } # "0.1"
