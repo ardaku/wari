@@ -235,15 +235,15 @@ pub enum I {
     BLTU { s1: Reg, s2: Reg, im: i16 },
     /// SB: 12-bit immediate offset Branch on Greater Than Or Equal To (Unsigned)
     BGEU { s1: Reg, s2: Reg, im: i16 },
-    /// I: Load Byte (R[d]: M[R[s] + im])
+    /// I: Load Byte (`R[d]: M[R[s] + im]`)
     LB { d: Reg, s: Reg, im: i16 },
-    /// I: Load Half-Word (R[d]: M[R[s] + im])
+    /// I: Load Half-Word (`R[d]: M[R[s] + im]`)
     LH { d: Reg, s: Reg, im: i16 },
-    /// I: Load Word (R[d]: M[R[s] + im])
+    /// I: Load Word (`R[d]: M[R[s] + im]`)
     LW { d: Reg, s: Reg, im: i16 },
-    /// I: Load Byte Unsigned (R[d]: M[R[s] + im])
+    /// I: Load Byte Unsigned (`R[d]: M[R[s] + im]`)
     LBU { d: Reg, s: Reg, im: i16 },
-    /// I: Load Half Unsigned (R[d]: M[R[s] + im])
+    /// I: Load Half Unsigned (`R[d]: M[R[s] + im]`)
     LHU { d: Reg, s: Reg, im: i16 },
     /// S: Store Byte
     SB { s1: Reg, s2: Reg, im: i16 },
@@ -251,7 +251,7 @@ pub enum I {
     SH { s1: Reg, s2: Reg, im: i16 },
     /// S: Store Word
     SW { s1: Reg, s2: Reg, im: i16 },
-    /// I: Add Immediate (R[d]: R[s] + im)
+    /// I: Add Immediate (`R[d]: R[s] + im`)
     ADDI { d: Reg, s: Reg, im: i16 },
     /// I: Set 1 on Less Than, 0 Otherwise Immediate
     SLTI { d: Reg, s: Reg, im: i16 },
@@ -269,9 +269,9 @@ pub enum I {
     SRLI { d: Reg, s: Reg, im: i8 },
     /// I: Arithmetic Shift Right Immediate (See SRA).
     SRAI { d: Reg, s: Reg, im: i8 },
-    /// R: Add (R[d]: R[s1] + R[s2])
+    /// R: Add (`R[d]: R[s1] + R[s2]`)
     ADD { d: Reg, s1: Reg, s2: Reg },
-    /// R: Subtract (R[d]: R[s1] - R[s2])
+    /// R: Subtract (`R[d]: R[s1] - R[s2]`)
     SUB { d: Reg, s1: Reg, s2: Reg },
     /// R: Logical Left Shift
     SLL { d: Reg, s1: Reg, s2: Reg },
