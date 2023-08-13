@@ -519,9 +519,20 @@ impl From<I> for u32 {
         }
     }
 }
-
+#[derive(Debug, Clone, Copy)]
+///Error types when converting ``u32`` to ``I`
+pub enum ConversionErrorType {
+    ///Unknown funct3 field
+    UnknownFunct3(u32),
+    ///Unknown funct3 or funct7 field
+    UnknownFunct3Funct7(u32, u32),
+    ///Unknown Environment Control Transfer
+    UnknownEnvCtrlTransfer,
+    ///Unknown opcode
+    UnknownOpcode(u32),
+}
 impl TryFrom<u32> for I {
-    type Error = ();
+    type Error = ConversionErrorType;
     // Using match makes it easier to extend code in the future.
     #[allow(clippy::match_single_binding)]
     fn try_from(with: u32) -> Result<Self, Self::Error> {
@@ -533,19 +544,25 @@ impl TryFrom<u32> for I {
                 (d, 0b010, s, im) => LW { d, s, im },
                 (d, 0b100, s, im) => LBU { d, s, im },
                 (d, 0b101, s, im) => LHU { d, s, im },
-                (_, _, _, _mm) => return Err(()),
+                (_, funct, _, _mm) => {
+                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                }
             },
             // Misc. Memory Instructions
             0b0001111 => match I::from_i(with) {
                 (_, 0b000, _, im) => FENCE { im },
-                (_, _, _, _mm) => return Err(()),
+                (_, funct, _, _mm) => {
+                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                }
             },
             // Store To RAM
             0b0100011 => match I::from_s(with) {
                 (0b000, s1, s2, im) => SB { s1, s2, im },
                 (0b001, s1, s2, im) => SH { s1, s2, im },
                 (0b010, s1, s2, im) => SW { s1, s2, im },
-                (_, _s, _z, _mm) => return Err(()),
+                (funct, _s, _z, _mm) => {
+                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                }
             },
             // Immediate Arithmetic
             0b0010011 => match I::from_i(with) {
@@ -559,7 +576,9 @@ impl TryFrom<u32> for I {
                     (d, 0b001, s, im, 0b0000000) => SLLI { d, s, im },
                     (d, 0b101, s, im, 0b0000000) => SRLI { d, s, im },
                     (d, 0b101, s, im, 0b0100000) => SRAI { d, s, im },
-                    (_, _, _, _, _) => return Err(()),
+                    (_, funct, _, _, _) => {
+                        return Err(ConversionErrorType::UnknownFunct3(funct))
+                    }
                 },
             },
             // Add Upper Immediate To Program Counter
@@ -578,7 +597,11 @@ impl TryFrom<u32> for I {
                 (d, 0b101, s1, s2, 0b0100000) => SRA { d, s1, s2 },
                 (d, 0b110, s1, s2, 0b0000000) => OR { d, s1, s2 },
                 (d, 0b111, s1, s2, 0b0000000) => AND { d, s1, s2 },
-                (_, _, _s, _z, _) => return Err(()),
+                (_, f3, _s, _z, f7) => {
+                    return Err(ConversionErrorType::UnknownFunct3Funct7(
+                        f3, f7,
+                    ))
+                }
             },
             // Load upper immediate
             0b0110111 => match I::from_u(with) {
@@ -592,12 +615,16 @@ impl TryFrom<u32> for I {
                 (0b101, s1, s2, im) => BGE { s1, s2, im },
                 (0b110, s1, s2, im) => BLTU { s1, s2, im },
                 (0b111, s1, s2, im) => BGEU { s1, s2, im },
-                (_, _s, _z, _mm) => return Err(()),
+                (funct, _s, _z, _mm) => {
+                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                }
             },
             // Jump and link register
             0b1100111 => match I::from_i(with) {
                 (d, 0b000, s, im) => JALR { d, s, im },
-                (_d, _, _s, _im) => return Err(()),
+                (_d, funct, _s, _im) => {
+                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                }
             },
             // Jump and Link
             0b1101111 => match I::from_u(with) {
@@ -607,9 +634,9 @@ impl TryFrom<u32> for I {
             0b1110011 => match I::from_i(with) {
                 (ZERO, 0b000, ZERO, 0b000000000000) => ECALL {},
                 (ZERO, 0b000, ZERO, 0b000000000001) => EBREAK {},
-                _ => return Err(()),
+                _ => return Err(ConversionErrorType::UnknownEnvCtrlTransfer),
             },
-            _o => return Err(()),
+            o => return Err(ConversionErrorType::UnknownOpcode(o)),
         })
     }
 }
