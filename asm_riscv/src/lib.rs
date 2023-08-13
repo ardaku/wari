@@ -520,97 +520,96 @@ impl From<I> for u32 {
     }
 }
 
-impl From<u32> for I {
+impl TryFrom<u32> for I {
+    type Error = ();
     // Using match makes it easier to extend code in the future.
     #[allow(clippy::match_single_binding)]
-    fn from(with: u32) -> Self {
+    fn try_from(with: u32) -> Result<Self, Self::Error> {
         match with & 0b1111111 {
             // Load From RAM
             0b0000011 => match I::from_i(with) {
-                (d, 0b000, s, im) => LB { d, s, im },
-                (d, 0b001, s, im) => LH { d, s, im },
-                (d, 0b010, s, im) => LW { d, s, im },
-                (d, 0b100, s, im) => LBU { d, s, im },
-                (d, 0b101, s, im) => LHU { d, s, im },
-                (_, funct, _, _mm) => panic!("Unknown funct3: {}", funct),
+                (d, 0b000, s, im) => Ok(LB { d, s, im }),
+                (d, 0b001, s, im) => Ok(LH { d, s, im }),
+                (d, 0b010, s, im) => Ok(LW { d, s, im }),
+                (d, 0b100, s, im) => Ok(LBU { d, s, im }),
+                (d, 0b101, s, im) => Ok(LHU { d, s, im }),
+                (_, _, _, _mm) => Err(()),
             },
             // Misc. Memory Instructions
             0b0001111 => match I::from_i(with) {
-                (_, 0b000, _, im) => FENCE { im },
-                (_, funct, _, _mm) => panic!("Unknown funct3: {}", funct),
+                (_, 0b000, _, im) => Ok(FENCE { im }),
+                (_, _, _, _mm) => Err(()),
             },
             // Store To RAM
             0b0100011 => match I::from_s(with) {
-                (0b000, s1, s2, im) => SB { s1, s2, im },
-                (0b001, s1, s2, im) => SH { s1, s2, im },
-                (0b010, s1, s2, im) => SW { s1, s2, im },
-                (funct, _s, _z, _mm) => panic!("Unknown funct3: {}", funct),
+                (0b000, s1, s2, im) => Ok(SB { s1, s2, im }),
+                (0b001, s1, s2, im) => Ok(SH { s1, s2, im }),
+                (0b010, s1, s2, im) => Ok(SW { s1, s2, im }),
+                (_, _s, _z, _mm) => Err(()),
             },
             // Immediate Arithmetic
             0b0010011 => match I::from_i(with) {
-                (d, 0b000, s, im) => ADDI { d, s, im },
-                (d, 0b010, s, im) => SLTI { d, s, im },
-                (d, 0b011, s, im) => SLTUI { d, s, im },
-                (d, 0b100, s, im) => XORI { d, s, im },
-                (d, 0b110, s, im) => ORI { d, s, im },
-                (d, 0b111, s, im) => ANDI { d, s, im },
+                (d, 0b000, s, im) => Ok(ADDI { d, s, im }),
+                (d, 0b010, s, im) => Ok(SLTI { d, s, im }),
+                (d, 0b011, s, im) => Ok(SLTUI { d, s, im }),
+                (d, 0b100, s, im) => Ok(XORI { d, s, im }),
+                (d, 0b110, s, im) => Ok(ORI { d, s, im }),
+                (d, 0b111, s, im) => Ok(ANDI { d, s, im }),
                 _ => match I::from_i7(with) {
-                    (d, 0b001, s, im, 0b0000000) => SLLI { d, s, im },
-                    (d, 0b101, s, im, 0b0000000) => SRLI { d, s, im },
-                    (d, 0b101, s, im, 0b0100000) => SRAI { d, s, im },
-                    (_, funct, _, _, _) => panic!("Unknown funct3: {}", funct),
+                    (d, 0b001, s, im, 0b0000000) => Ok(SLLI { d, s, im }),
+                    (d, 0b101, s, im, 0b0000000) => Ok(SRLI { d, s, im }),
+                    (d, 0b101, s, im, 0b0100000) => Ok(SRAI { d, s, im }),
+                    (_, _, _, _, _) => Err(()),
                 },
             },
             // Add Upper Immediate To Program Counter
             0b0010111 => match I::from_u(with) {
-                (d, im) => AUIPC { d, im },
+                (d, im) => Ok(AUIPC { d, im }),
             },
             // Register Arithmetic
             0b0110011 => match I::from_r(with) {
-                (d, 0b000, s1, s2, 0b0000000) => ADD { d, s1, s2 },
-                (d, 0b000, s1, s2, 0b0100000) => SUB { d, s1, s2 },
-                (d, 0b001, s1, s2, 0b0000000) => SLL { d, s1, s2 },
-                (d, 0b010, s1, s2, 0b0000000) => SLT { d, s1, s2 },
-                (d, 0b011, s1, s2, 0b0000000) => SLTU { d, s1, s2 },
-                (d, 0b100, s1, s2, 0b0000000) => XOR { d, s1, s2 },
-                (d, 0b101, s1, s2, 0b0000000) => SRL { d, s1, s2 },
-                (d, 0b101, s1, s2, 0b0100000) => SRA { d, s1, s2 },
-                (d, 0b110, s1, s2, 0b0000000) => OR { d, s1, s2 },
-                (d, 0b111, s1, s2, 0b0000000) => AND { d, s1, s2 },
-                (_, f3, _s, _z, f7) => panic!("Unknown F3:{} F7:{}", f3, f7),
+                (d, 0b000, s1, s2, 0b0000000) => Ok(ADD { d, s1, s2 }),
+                (d, 0b000, s1, s2, 0b0100000) => Ok(SUB { d, s1, s2 }),
+                (d, 0b001, s1, s2, 0b0000000) => Ok(SLL { d, s1, s2 }),
+                (d, 0b010, s1, s2, 0b0000000) => Ok(SLT { d, s1, s2 }),
+                (d, 0b011, s1, s2, 0b0000000) => Ok(SLTU { d, s1, s2 }),
+                (d, 0b100, s1, s2, 0b0000000) => Ok(XOR { d, s1, s2 }),
+                (d, 0b101, s1, s2, 0b0000000) => Ok(SRL { d, s1, s2 }),
+                (d, 0b101, s1, s2, 0b0100000) => Ok(SRA { d, s1, s2 }),
+                (d, 0b110, s1, s2, 0b0000000) => Ok(OR { d, s1, s2 }),
+                (d, 0b111, s1, s2, 0b0000000) => Ok(AND { d, s1, s2 }),
+                (_, _, _s, _z, _) => Err(()),
             },
             // Load upper immediate
             0b0110111 => match I::from_u(with) {
-                (d, im) => LUI { d, im },
+                (d, im) => Ok(LUI { d, im }),
             },
             // Branch on Condition
             0b1100011 => match I::from_s(with) {
-                (0b000, s1, s2, im) => BEQ { s1, s2, im },
-                (0b001, s1, s2, im) => BNE { s1, s2, im },
-                (0b100, s1, s2, im) => BLT { s1, s2, im },
-                (0b101, s1, s2, im) => BGE { s1, s2, im },
-                (0b110, s1, s2, im) => BLTU { s1, s2, im },
-                (0b111, s1, s2, im) => BGEU { s1, s2, im },
-                (funct, _s, _z, _mm) => panic!("Unknown funct3: {}", funct),
+                (0b000, s1, s2, im) => Ok(BEQ { s1, s2, im }),
+                (0b001, s1, s2, im) => Ok(BNE { s1, s2, im }),
+                (0b100, s1, s2, im) => Ok(BLT { s1, s2, im }),
+                (0b101, s1, s2, im) => Ok(BGE { s1, s2, im }),
+                (0b110, s1, s2, im) => Ok(BLTU { s1, s2, im }),
+                (0b111, s1, s2, im) => Ok(BGEU { s1, s2, im }),
+                (_, _s, _z, _mm) => Err(()),
             },
             // Jump and link register
             0b1100111 => match I::from_i(with) {
-                (d, 0b000, s, im) => JALR { d, s, im },
-                (_d, f3, _s, _im) => panic!("Unknown F3:{}", f3),
+                (d, 0b000, s, im) => Ok(JALR { d, s, im }),
+                (_d, _, _s, _im) => Err(()),
             },
             // Jump and Link
             0b1101111 => match I::from_u(with) {
-                (d, im) => JAL { d, im },
+                (d, im) => Ok(JAL { d, im }),
             },
             // Transfer Control
             0b1110011 => match I::from_i(with) {
-                (ZERO, 0b000, ZERO, 0b000000000000) => ECALL {},
-                (ZERO, 0b000, ZERO, 0b000000000001) => EBREAK {},
-                _ => panic!("Unknown Environment Control Transfer"),
+                (ZERO, 0b000, ZERO, 0b000000000000) => Ok(ECALL {}),
+                (ZERO, 0b000, ZERO, 0b000000000001) => Ok(EBREAK {}),
+                _ => Err(()),
             },
-            o => {
-                panic!("Failed to parse RISC-V Assembly, Unknown Opcode {}", o)
-            }
+            _o => Err(()),
         }
     }
 }
