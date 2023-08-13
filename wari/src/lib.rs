@@ -37,11 +37,13 @@
 
 /// A WebAssembly Module (decoded by section)
 #[derive(Copy, Clone, Debug)]
-pub struct Module {}
+pub struct Module {
+}
 
 /// Compiles and runs code from WebAssembly Modules
 #[derive(Copy, Clone, Debug)]
-pub struct Runtime {}
+pub struct Runtime {
+}
 
 #[cfg(test)]
 mod tests {
