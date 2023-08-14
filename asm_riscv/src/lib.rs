@@ -520,19 +520,19 @@ impl From<I> for u32 {
     }
 }
 #[derive(Debug, Clone, Copy)]
-///Error types when converting ``u32`` to ``I`
-pub enum ConversionErrorType {
-    ///Unknown funct3 field
+/// Error types when converting `u32` to `I`
+pub enum ConversionError {
+    /// Unknown funct3 field
     UnknownFunct3(u32),
-    ///Unknown funct3 or funct7 field
+    /// Unknown funct3 or funct7 field
     UnknownFunct3Funct7(u32, u32),
-    ///Unknown Environment Control Transfer
+    /// Unknown Environment Control Transfer
     UnknownEnvCtrlTransfer,
-    ///Unknown opcode
+    /// Unknown opcode
     UnknownOpcode(u32),
 }
 impl TryFrom<u32> for I {
-    type Error = ConversionErrorType;
+    type Error = ConversionError;
     // Using match makes it easier to extend code in the future.
     #[allow(clippy::match_single_binding)]
     fn try_from(with: u32) -> Result<Self, Self::Error> {
@@ -545,14 +545,14 @@ impl TryFrom<u32> for I {
                 (d, 0b100, s, im) => LBU { d, s, im },
                 (d, 0b101, s, im) => LHU { d, s, im },
                 (_, funct, _, _mm) => {
-                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                    return Err(ConversionError::UnknownFunct3(funct))
                 }
             },
             // Misc. Memory Instructions
             0b0001111 => match I::from_i(with) {
                 (_, 0b000, _, im) => FENCE { im },
                 (_, funct, _, _mm) => {
-                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                    return Err(ConversionError::UnknownFunct3(funct))
                 }
             },
             // Store To RAM
@@ -561,7 +561,7 @@ impl TryFrom<u32> for I {
                 (0b001, s1, s2, im) => SH { s1, s2, im },
                 (0b010, s1, s2, im) => SW { s1, s2, im },
                 (funct, _s, _z, _mm) => {
-                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                    return Err(ConversionError::UnknownFunct3(funct))
                 }
             },
             // Immediate Arithmetic
@@ -577,7 +577,7 @@ impl TryFrom<u32> for I {
                     (d, 0b101, s, im, 0b0000000) => SRLI { d, s, im },
                     (d, 0b101, s, im, 0b0100000) => SRAI { d, s, im },
                     (_, funct, _, _, _) => {
-                        return Err(ConversionErrorType::UnknownFunct3(funct))
+                        return Err(ConversionError::UnknownFunct3(funct))
                     }
                 },
             },
@@ -598,7 +598,7 @@ impl TryFrom<u32> for I {
                 (d, 0b110, s1, s2, 0b0000000) => OR { d, s1, s2 },
                 (d, 0b111, s1, s2, 0b0000000) => AND { d, s1, s2 },
                 (_, f3, _s, _z, f7) => {
-                    return Err(ConversionErrorType::UnknownFunct3Funct7(
+                    return Err(ConversionError::UnknownFunct3Funct7(
                         f3, f7,
                     ))
                 }
@@ -616,14 +616,14 @@ impl TryFrom<u32> for I {
                 (0b110, s1, s2, im) => BLTU { s1, s2, im },
                 (0b111, s1, s2, im) => BGEU { s1, s2, im },
                 (funct, _s, _z, _mm) => {
-                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                    return Err(ConversionError::UnknownFunct3(funct))
                 }
             },
             // Jump and link register
             0b1100111 => match I::from_i(with) {
                 (d, 0b000, s, im) => JALR { d, s, im },
                 (_d, funct, _s, _im) => {
-                    return Err(ConversionErrorType::UnknownFunct3(funct))
+                    return Err(ConversionError::UnknownFunct3(funct))
                 }
             },
             // Jump and Link
@@ -634,9 +634,9 @@ impl TryFrom<u32> for I {
             0b1110011 => match I::from_i(with) {
                 (ZERO, 0b000, ZERO, 0b000000000000) => ECALL {},
                 (ZERO, 0b000, ZERO, 0b000000000001) => EBREAK {},
-                _ => return Err(ConversionErrorType::UnknownEnvCtrlTransfer),
+                _ => return Err(ConversionError::UnknownEnvCtrlTransfer),
             },
-            o => return Err(ConversionErrorType::UnknownOpcode(o)),
+            o => return Err(ConversionError::UnknownOpcode(o)),
         })
     }
 }
