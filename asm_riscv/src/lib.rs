@@ -1,11 +1,11 @@
-//! RISC-V 32-Bit Base Integer Instructions to compile into, with optional
-//! extensions that can be enabled.
+//! RISC-V 32-Bit Base Integer Instructions to compile into, with plans for
+//! optional extensions that can be enabled.
 //! - RV32M Multiply Extension
 //! - RV32A Atomic Extension
 //! - RV32F Single-Precision Floating Point Extension
 //! - RV32D Double-Precision Floating Point Extension
 //!
-//! # Ignored For Now
+//! # Not Planned For Now
 //! - RV32Q Quadruple-Precision Floating Point Extension
 //! - RV32C Compression 16-bit Instructions
 //! - All 64 bit extensions
